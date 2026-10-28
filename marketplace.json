@@ -1,0 +1,32 @@
+{
+  "name": "hebrew-localization",
+  "owner": {
+    "name": "Noam Sasson",
+    "url": "https://github.com/noamsmart"
+  },
+  "metadata": {
+    "description": "פלאגינים לתרגום, כתוביות ודיבוב בעברית.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "hebrew-screen-localization",
+      "source": "./plugins/hebrew-screen-localization",
+      "description": "זרימת עבודה מקצועית לתרגום סרטים וסדרות לעברית, כולל תמלול, כתוביות RTL, דיבוב ובקרת איכות.",
+      "version": "0.4.0",
+      "author": {
+        "name": "Noam Sasson",
+        "url": "https://github.com/noamsmart"
+      },
+      "homepage": "https://hebrew-localization-noam-sasson.noam-sasson-ph.chatgpt.site/",
+      "repository": "https://github.com/noamsmart/hebrew-localization-plugins",
+      "keywords": [
+        "hebrew",
+        "translation",
+        "subtitles",
+        "dubbing",
+        "localization"
+      ]
+    }
+  ]
+}
