@@ -12,7 +12,7 @@ from media_tools import TOOLS as MEDIA_TOOLS
 from job_tools import TOOLS as JOB_TOOLS
 from localization_tools import TOOLS as LOCALIZATION_TOOLS
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 PROTOCOLS = ("2024-11-05", "2025-03-26", "2025-06-18")
 TOOLS = {**SUBTITLE_TOOLS, **MEDIA_TOOLS, **JOB_TOOLS, **LOCALIZATION_TOOLS}
 assert len(TOOLS) == len(SUBTITLE_TOOLS) + len(MEDIA_TOOLS) + len(JOB_TOOLS) + len(LOCALIZATION_TOOLS), "Duplicate tool names"
@@ -146,16 +146,48 @@ def main():
         if result["isError"]:
             sys.exit(1)
         return
-    for line in sys.stdin:
-        try:
-            if len(line) > 16 * 1024 * 1024:
+    def read_packet():
+        first = sys.stdin.buffer.readline()
+        if not first:
+            return None, False
+        if first.lower().startswith(b"content-length:"):
+            try:
+                length = int(first.split(b":", 1)[1].strip())
+            except (ValueError, IndexError) as exc:
+                raise ValueError("Invalid Content-Length header") from exc
+            if length < 0 or length > 16 * 1024 * 1024:
                 raise ValueError("Request exceeds 16 MiB")
-            request = json.loads(line, parse_constant=lambda _: (_ for _ in ()).throw(ValueError("Non-finite JSON number")))
+            while True:
+                header = sys.stdin.buffer.readline()
+                if not header:
+                    raise ValueError("Truncated MCP headers")
+                if header in (b"\r\n", b"\n"):
+                    break
+            payload = sys.stdin.buffer.read(length)
+            if len(payload) != length:
+                raise ValueError("Truncated MCP request")
+            return payload.decode("utf-8"), True
+        if len(first) > 16 * 1024 * 1024:
+            raise ValueError("Request exceeds 16 MiB")
+        return first.decode("utf-8"), False
+
+    while True:
+        framed = False
+        try:
+            packet, framed = read_packet()
+            if packet is None:
+                break
+            request = json.loads(packet, parse_constant=lambda _: (_ for _ in ()).throw(ValueError("Non-finite JSON number")))
             response = handle(request)
         except (ValueError, UnicodeError) as exc:
             response = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": str(exc)}}
         if response is not None:
-            print(json.dumps(response, ensure_ascii=False, allow_nan=False), flush=True)
+            if framed:
+                encoded = json.dumps(response, ensure_ascii=False, allow_nan=False).encode("utf-8")
+                sys.stdout.buffer.write(f"Content-Length: {len(encoded)}\r\n\r\n".encode("ascii") + encoded)
+                sys.stdout.buffer.flush()
+            else:
+                print(json.dumps(response, ensure_ascii=False, allow_nan=False), flush=True)
 
 
 if __name__ == "__main__":

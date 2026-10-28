@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "hebrew-screen-localization",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A professional workflow for translating films and episodic content into natural Hebrew, including speech-act and delivery-tone analysis (question vs statement, rhetorical questions, sarcasm), context-sensitive dialogue, subtitle timing, dubbing adaptation, continuity, full-watch QC, and delivery.",
   "author": {
     "name": "noam sasson"
