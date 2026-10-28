@@ -1,0 +1,40 @@
+{
+  "$schema": "https://catalog.msh.team/misc/kimi.plugin.schema.json",
+  "name": "hebrew-screen-localization",
+  "version": "0.4.0+local.20261026-233343",
+  "description": "זרימת עבודה לתרגום סרטים וסדרות לעברית, כולל תמלול ישיר משפות המקור ותרגום לעברית גם ללא תבנית אנגלית, בחירת ערוץ שמע מקורי, כתוביות RTL, עקביות דמויות ובקרת איכות.",
+  "keywords": [
+    "תרגום",
+    "כתוביות",
+    "דיבוב",
+    "לוקליזציה",
+    "עברית"
+  ],
+  "author": "noam sasson",
+  "license": "UNKNOWN",
+  "interface": {
+    "displayName": "לוקליזציה עברית למסך",
+    "shortDescription": "סטודיו מקצועי לכתוביות, תרגום ודיבוב בעברית",
+    "longDescription": "זרימות עבודה ללוקליזציה טבעית של סרטים וסדרות לעברית: בחירת דיאלוג וטקסט משמעותי על המסך, שמירת קול הדמויות והעקביות, הבחנה בין שאלות, אמירות, בקשות וסרקזם לפי הקשר חזותי ושמיעתי, יצירת כתוביות RTL מסונכרנות או התאמות דיבוב ובקרת איכות. פועל ב־Kimi עם הכלים והחומרים הזמינים בשיחה; יכולות עיבוד המדיה והייצוא תלויות בכלים המקומיים המותקנים. המפרסם: noam sasson; אין מערכת נפרדת לשמירת תוכן משתמשים.",
+    "developerName": "noam sasson",
+    "category": "PRODUCTIVITY",
+    "websiteURL": "https://hebrew-localization-noam-sasson.noam-sasson-ph.chatgpt.site/",
+    "hostKind": "local",
+    "platforms": [
+      "macos",
+      "linux",
+      "windows"
+    ]
+  },
+  "skills": "./skills",
+  "mcpServers": {
+    "hebrew-localization-local": {
+      "command": "node",
+      "args": [
+        "./runtime/launch.cjs"
+      ],
+      "env": {},
+      "cwd": "./"
+    }
+  }
+}

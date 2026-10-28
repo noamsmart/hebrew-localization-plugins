@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "hebrew-localization-local": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${PLUGIN_ROOT}/runtime/launch.cjs"
+      ],
+      "env": {},
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}

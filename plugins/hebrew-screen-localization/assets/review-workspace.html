@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>בדיקת כתוביות מקומית</title>
+<style>
+body{margin:0;background:#101722;color:#eaf0f7;font:16px system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:22px}h1{font-size:25px}p{line-height:1.6}.notice{background:#243449;padding:12px;border-radius:8px}.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}.player{position:relative;background:#000;min-height:220px}video{width:100%;max-height:550px}.overlay{position:absolute;bottom:52px;left:4%;right:4%;text-align:center;white-space:pre-line;pointer-events:none;color:white;font-size:24px;line-height:1.35;text-shadow:0 2px 4px #000,2px 0 3px #000;background:#0008;border-radius:5px}button,input,textarea{font:inherit}button{padding:9px 15px;margin:4px;border:0;border-radius:5px;background:#9dc7ff;color:#10223b;cursor:pointer}textarea{box-sizing:border-box;width:100%;min-height:145px;padding:12px;color:#eff5ff;background:#172333;border:1px solid #8095b0;border-radius:5px;font-size:21px;line-height:1.5;resize:vertical}pre{white-space:pre-wrap;background:#172333;padding:12px;border-radius:5px;min-height:60px}label{display:block;margin:9px 0}.metrics{padding:10px;border:1px solid #44556c;border-radius:5px}#error{color:#ffb8a7}input[type=number]{width:90px}button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:3px}@media(max-width:780px){.grid{grid-template-columns:1fr}}
+</style></head><body><main>
+<h1>בדיקת כתוביות מקומית</h1>
+<p class="notice">הקבצים נשארים במחשב. בוחרים מדיה מקומית לצפייה וייצוא מוריד קבצים חדשים; הקלט המקורי אינו משתנה. אין קידוד וידאו, רשת או העלאה. השמירה אינה אישור לתרגום, לסנכרון או לצפייה מלאה.</p>
+<p>אם הדפדפן אינו מנגן HEVC, או שאי אפשר לבחור את פס הקול בשפת המקור שנבחרה, יש לבדוק את הכתוביות עם המדיה בנגן המקורי. התצוגה כאן מציגה טקסט פשוט ואינה מבטיחה את העיצוב בנגן היעד.</p>
+<label>בחירת מדיה מקומית <input id="media" type="file" accept="video/*,audio/*,.mkv"></label>
+<div class="grid"><section><div class="player"><video id="video" controls preload="metadata"></video><div id="overlay" class="overlay" dir="rtl"></div></div>
+<div><button id="prev">הקודמת</button><button id="play">ניגון הקטע</button><button id="next">הבאה</button></div>
+<label><input id="loop" type="checkbox"> חזרה על הקטע</label><p id="error" role="status"></p></section>
+<section><p id="names"></p><label>מספר כתובית <input id="index" type="number" min="1" value="1"></label><p id="clock" dir="ltr"></p>
+<label for="source">מקור בחלון הזמן</label><pre id="source" dir="auto"></pre>
+<label for="edit">תרגום בעברית</label><textarea id="edit" dir="rtl" spellcheck="true"></textarea>
+<p id="metrics" class="metrics" aria-live="polite"></p><label><input id="rtlmarks" type="checkbox"> שמירת סימוני כיוון לעברית בקובץ SRT</label><p>ברירת המחדל משמרת את נוכחות הסימונים בקלט; אפשר לכבות לפי הנגן. יש לבדוק את קובץ הייצוא בנגן היעד.</p><button id="srt">הורדת SRT ערוך</button><button id="json">הורדת JSON ערוך</button>
+<p>העריכה נשמרת בזיכרון העמוד עד להורדה. יציאה או רענון לפני הורדה עלולים לאבד שינויים. ספי הקריאה המוצגים הם אזהרות לפי הפרופיל שנבחר; מפרט יעד עשוי לדרוש ערכים אחרים. תגיות עיצוב אינן מוצגות בתצוגת הטקסט הפשוט ואינן נספרות כתווים.</p><p id="profile"></p></section></div>
+</main><script id="workspace-data" type="application/json">__WORKSPACE_DATA__</script><script>
+'use strict';
+const data=JSON.parse(document.getElementById('workspace-data').textContent);
+const cues=data.target_cues.map(c=>({...c}));
+const limits=data.limits||{max_lines:2,max_line_characters:42,max_cps:20};
+const combining=new Set(data.combining_characters||'');
+const entityMap=data.html_entities||{'amp;':'&','lt;':'<','gt;':'>','quot;':'"','nbsp;':'\u00a0'};
+const invalidEntities=new Set(data.invalid_entity_codepoints||[]);
+function unescapeEntities(text){return text.replace(/&(#[0-9]+;?|#[xX][0-9a-fA-F]+;?|[^\t\n\f <&#;]{1,32};?)/g,(whole,ref)=>{if(ref[0]==='#'){const value=parseInt(ref.replace(/;$/,'' ).slice(ref[1].toLowerCase()==='x'?2:1),ref[1].toLowerCase()==='x'?16:10);const replacements=data.numeric_entity_replacements||{};if(Object.hasOwn(replacements,String(value)))return replacements[String(value)];if(value>0x10ffff||(value>=0xd800&&value<=0xdfff))return '\ufffd';if(invalidEntities.has(value))return '';return String.fromCodePoint(value);}if(Object.hasOwn(entityMap,ref))return entityMap[ref];for(let i=ref.length-1;i>1;i--)if(Object.hasOwn(entityMap,ref.slice(0,i)))return entityMap[ref.slice(0,i)]+ref.slice(i);return whole;});}
+function visibleLines(text){return unescapeEntities(text.replace(/\r\n/g,'\n').replace(/\u200f/g,'').replace(/\{\\an[1-9]\}/g,'').replace(/<\/?(?:i|b|u|s|font)(?:\s+[^<>]*)?>/gi,'')).split('\n');}
+const el=id=>document.getElementById(id), video=el('video');
+let selected=0, mediaUrl=null, stopAt=null;
+function stamp(ms){const h=Math.floor(ms/3600000),m=Math.floor(ms/60000)%60,s=Math.floor(ms/1000)%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+','+String(ms%1000).padStart(3,'0');}
+function visibleCount(text){return Array.from(text).filter(c=>!combining.has(c)&&!/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/u.test(c)).length;}
+function metrics(){const c=cues[selected],lines=visibleLines(c.text),counts=lines.map(visibleCount),chars=counts.reduce((a,b)=>a+b,0),cps=chars*1000/(c.end-c.start);const flags=[];if(lines.length>limits.max_lines)flags.push('יותר מ־'+limits.max_lines+' שורות');if(counts.some(n=>n>limits.max_line_characters))flags.push('שורה מעל '+limits.max_line_characters+' תווים');if(cps>limits.max_cps)flags.push('מעל '+limits.max_cps+' CPS');el('metrics').textContent=counts.join(' / ')+' תווים בשורות · '+chars+' תווים · '+cps.toFixed(1)+' CPS'+(flags.length?' · לבדיקה: '+flags.join(', '):'');}
+function overlay(){const t=Math.round(video.currentTime*1000);el('overlay').textContent=cues.filter(c=>c.start<=t&&t<c.end).map(c=>visibleLines(c.text).join('\n')).join('\n');}
+function show(index,seek=true){selected=Math.max(0,Math.min(cues.length-1,index));const c=cues[selected];el('index').value=selected+1;el('clock').textContent=stamp(c.start)+' --> '+stamp(c.end);el('edit').value=c.text;const source=data.source_cues.filter(s=>s.start<c.end&&s.end>c.start);el('source').textContent=source.map(s=>visibleLines(s.text).join('\n')).join('\n\n')||'אין כתובית מקור חופפת; יש לבדוק במקור.';metrics();stopAt=null;if(seek&&video.src){video.pause();video.currentTime=Math.max(0,c.start/1000-0.25);}overlay();}
+function playCue(){if(!video.src){el('error').textContent='יש לבחור קובץ מדיה מקומי. אם אין ניגון, יש להשתמש בנגן המקורי.';return;}const c=cues[selected];video.currentTime=Math.max(0,c.start/1000-0.25);stopAt=c.end/1000+0.25;video.play().catch(()=>{el('error').textContent='הדפדפן לא הצליח לנגן. יש לבדוק את המדיה ופס הקול בשפת המקור שנבחרה בנגן המקורי.';});}
+el('names').textContent=data.source_name+' ← '+data.target_name;
+el('rtlmarks').checked=Boolean(data.rtl_marks);
+el('profile').textContent='פרופיל: '+(data.profile==='children'?'ילדים':'מבוגרים')+' · עד '+limits.max_lines+' שורות · '+limits.max_line_characters+' תווים בשורה · אזהרה מעל '+limits.max_cps+' CPS';
+el('index').max=cues.length;
+el('prev').addEventListener('click',()=>show(selected-1));el('next').addEventListener('click',()=>show(selected+1));el('index').addEventListener('change',()=>show((Number(el('index').value)||1)-1));el('play').addEventListener('click',playCue);
+el('edit').addEventListener('input',()=>{cues[selected].text=el('edit').value.replace(/\r\n/g,'\n');metrics();overlay();});
+el('media').addEventListener('change',()=>{const file=el('media').files[0];if(!file)return;video.pause();if(mediaUrl)URL.revokeObjectURL(mediaUrl);mediaUrl=URL.createObjectURL(file);video.src=mediaUrl;video.load();el('error').textContent='יש לוודא שזה הקובץ הנכון ושנבחר פס הקול בשפת המקור הרצויה. בחירת פס קול אינה זמינה בכל דפדפן.';stopAt=null;});
+video.addEventListener('timeupdate',()=>{overlay();if(stopAt!==null&&video.currentTime>=stopAt){video.pause();stopAt=null;if(el('loop').checked)playCue();}});
+video.addEventListener('error',()=>{el('error').textContent='ייתכן שהדפדפן אינו תומך בקובץ או ב־HEVC. יש להשתמש בנגן המקורי; לא נוצר קידוד חלופי.';});
+function validEdits(){return cues.every(c=>c.text.trim()&&!c.text.includes('\n\n')&&!/[\u0000\ufeff\ufffd]/u.test(c.text)&&c.text.split('\n').every(line=>line.trim()));}
+function download(content,name,type){const url=URL.createObjectURL(new Blob([content],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+el('srt').addEventListener('click',()=>{if(!validEdits()){el('error').textContent='יש לתקן כתוביות או שורות ריקות ותווים לא תקינים לפני ייצוא.';return;}const marked=el('rtlmarks').checked;const text=cues.map((c,i)=>{const lines=c.text.replace(/\u200f/g,'').split('\n').map(line=>marked?'\u200f'+line+'\u200f':line);return (i+1)+'\r\n'+stamp(c.start)+' --> '+stamp(c.end)+'\r\n'+lines.join('\r\n')+'\r\n';}).join('\r\n');download(text,'edited.he.srt','text/plain;charset=utf-8');});
+el('json').addEventListener('click',()=>download(JSON.stringify({format:'hebrew-review-edits-v1',edited_at:new Date().toISOString(),source_sha256:data.source_sha256,original_target_sha256:data.target_sha256,profile:data.profile,limits,rtl_marks:el('rtlmarks').checked,cues:cues.map(c=>({...c,text:c.text.replace(/\u200f/g,'')})),semantic_status:'SEMANTIC_NOT_VERIFIED',synchronization_status:'NOT_VERIFIED',full_watch_status:'NOT_VERIFIED'},null,2)+'\n','edited.he.json','application/json;charset=utf-8'));
+window.addEventListener('beforeunload',()=>{if(mediaUrl)URL.revokeObjectURL(mediaUrl);});show(0,false);
+</script></body></html>

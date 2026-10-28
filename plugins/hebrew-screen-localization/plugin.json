@@ -1,0 +1,46 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "hebrew-screen-localization",
+  "version": "0.4.0",
+  "description": "A professional workflow for translating films and episodic content into natural Hebrew, including speech-act and delivery-tone analysis (question vs statement, rhetorical questions, sarcasm), context-sensitive dialogue, subtitle timing, dubbing adaptation, continuity, full-watch QC, and delivery.",
+  "author": {
+    "name": "noam sasson"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Hebrew Screen Localization",
+        "shortDescription": "Hebrew subtitle studio",
+        "longDescription": "Workflows for natural Hebrew localization of films and series. Select relevant speech and meaningful on-screen text, preserve character voice and continuity, interpret whether lines are questions, statements, requests or ironic remarks using available audiovisual context, prepare timed RTL subtitles or dubbing adaptations, and perform contextual quality control. Works through ChatGPT and the tools available in your session; media processing and exports depend on those tools and the supplied assets. Publisher: noam sasson. The publisher has no separate user-content storage.",
+        "developerName": "noam sasson",
+        "category": "Productivity",
+        "capabilities": [
+          "Interactive"
+        ],
+        "defaultPrompt": [
+          "תרגם את הפרק הזה לעברית ברמת אולפן ובצע את כל שלבי בקרת האיכות.",
+          "צור כתוביות עבריות טבעיות ומסונכרנות למדיה הזאת.",
+          "בדוק את התרגום הקיים מול הפרק המלא ותקן בעיות הקשר, תזמון ושפה."
+        ],
+        "websiteURL": "https://hebrew-localization-noam-sasson.noam-sasson-ph.chatgpt.site/",
+        "supportURL": "https://hebrew-localization-noam-sasson.noam-sasson-ph.chatgpt.site/help",
+        "privacyPolicyURL": "https://hebrew-localization-noam-sasson.noam-sasson-ph.chatgpt.site/privacy",
+        "termsOfServiceURL": "https://hebrew-localization-noam-sasson.noam-sasson-ph.chatgpt.site/terms"
+      },
+      "review": {
+        "commerce": false,
+        "commerce_description": "The plugin is free, does not sell products and does not process payments."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "Adds a mandatory speech-act and audiovisual tone review for Hebrew localization: disambiguates genuine/rhetorical questions, statements spoken as questions, indirect requests, sarcasm, emphasis, interruptions and connected replies. Includes evidence/uncertainty discipline, Hebrew punctuation/voice QA, scene-linked calibration examples and extended naturalness checks. Preserves the existing name, publisher, URLs, user-approved scoped wording, source-fidelity, synchronization, RTL, selection and full-watch requirements.",
+        "translations": {
+          "he-IL": {
+            "subtitle": "לוקליזציה עברית למסך",
+            "description": "פלאגין מאת noam sasson לתרגום סרטים וסדרות לעברית טבעית. כולל זיהוי שאלות לעומת אמירות, טון ואינטונציה לפי ההקשר והשמע הזמין, שמירת קול הדמויות ועקביות, בחירת דיאלוג וטקסט על המסך, הכנת כתוביות ודיבוב ובקרת איכות. עיבוד מדיה וייצוא תלויים בכלים הזמינים בשיחה ובחומר שסופק. למפרסם אין מערכת נפרדת לשמירת תוכן המשתמשים."
+          }
+        }
+      }
+    }
+  }
+}
